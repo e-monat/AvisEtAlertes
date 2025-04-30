@@ -3,7 +3,7 @@ import React from "react";
 const Footer = () => {
     return (
         <footer className="footer">
-            <img src="src/assets/petitlogo.png" alt="Montréal Logo" className="footer-logo" />
+            <img src="//petitlogo.png" alt="Montréal Logo" className="footer-logo" />
             <ul className="arrondissement-list">
                 <li>Ahuntsic-Cartierville</li>
                 <li>Montréal-Nord</li>

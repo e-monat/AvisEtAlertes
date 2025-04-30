@@ -325,3 +325,45 @@ body {
   }
 }
 
+.install-prompt {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ddd;
+  text-align: center;
+}
+
+.install-prompt button {
+  background-color: #004080;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.install-prompt button:hover {
+  background-color: #003060;
+}
+
+.pagination {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.page-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  background-color: white;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+}
+
+.page-button.active {
+  background-color: #0072ce;
+  color: white;
+  border-color: #0072ce;
+}

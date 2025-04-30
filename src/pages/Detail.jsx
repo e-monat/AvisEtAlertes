@@ -1,13 +1,19 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import alerts from "../data/alerts";
 
 const Detail = () => {
-    //Recupere le parametre id avec l'URL de useParams
     const { id } = useParams();
-    //Recherche l'alerte qui correspond a l'ID dans la liste
-    const alert = alerts.find(alert => alert.id === parseInt(id));
-    //Si l'alerte n'est pass trouvee, affiche un message d'erreur
+    const [alert, setAlert] = useState(null);
+
+    useEffect(() => {
+        const storedAlerts = localStorage.getItem("alerts");
+        if (storedAlerts) {
+            const parsedAlerts = JSON.parse(storedAlerts);
+            const foundAlert = parsedAlerts.find(alert => alert.id === parseInt(id));
+            setAlert(foundAlert);
+        }
+    }, [id]);
+
     if (!alert) {
         return <h2>Alerte non trouvée</h2>;
     }

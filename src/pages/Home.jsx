@@ -1,33 +1,58 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AlertList from "../components/AlertList";
 import SearchBar from "../components/SearchBar";
 import Filters from "../components/Filters";
 import SubscriptionBox from "../components/SubscriptionBox";
-import alerts from "../data/alerts";
+import useAlerts from "../hooks/useAlerts.js";
+
+const ALERTS_PER_PAGE = 10;
 
 const Home = () => {
-    const [search, setSearch] = useState("");//Etat par la recherche par titre
-    const [selectedArrondissement, setSelectedArrondissement] = useState("");//Etat pour le filtre par arrondissement
-    const [selectedSubject, setSelectedSubject] = useState("");//Etat pour le filtre par sujet
-    const [selectedDate, setSelectedDate] = useState("");//Etat pour le filtre par date
+    const { alerts, loading, error } = useAlerts();
+    const [search, setSearch] = useState("");
+    const [selectedArrondissements, setSelectedArrondissements] = useState([]);
+    const [selectedSubjects, setSelectedSubjects] = useState([]);
+    const [dateRange, setDateRange] = useState({ start: "", end: "" });
+    const [currentPage, setCurrentPage] = useState(1);
 
-    //FIltrage des alertes selon les filtres choisi
     const filteredAlerts = alerts.filter(alert => {
-        //Verifie si le titre de l'alerte correspond avec ce qui a ete entrer
         const matchesSearch = alert.title.toLowerCase().includes(search.toLowerCase());
 
-        //Verifie si l'alerte correspond a l'arrondissement choisi
-        const matchesArrondissement = selectedArrondissement === "" || alert.arrondissement === selectedArrondissement;
+        const matchesArrondissement = selectedArrondissements.length === 0 ||
+            selectedArrondissements.includes(alert.arrondissement);
 
-        //Verifie si l'alerte correspond au sujet choisi
-        const matchesSubject = selectedSubject === "" || alert.category === selectedSubject;
+        const matchesSubject = selectedSubjects.length === 0 ||
+            selectedSubjects.includes(alert.category);
 
-        //Verifie si l'alerte correspond a la date choisi
-        const matchesDate = selectedDate === "" || alert.date === selectedDate;
-
+        const matchesDate = (() => {
+            if (!dateRange.start && !dateRange.end) return true;
+            const alertDate = new Date(alert.date);
+            const start = dateRange.start ? new Date(dateRange.start) : null;
+            const end = dateRange.end ? new Date(dateRange.end) : null;
+            return (!start || alertDate >= start) && (!end || alertDate <= end);
+        })();
 
         return matchesSearch && matchesArrondissement && matchesSubject && matchesDate;
     });
+
+    const totalPages = Math.ceil(filteredAlerts.length / ALERTS_PER_PAGE);
+
+    const currentAlerts = filteredAlerts.slice(
+        (currentPage - 1) * ALERTS_PER_PAGE,
+        currentPage * ALERTS_PER_PAGE
+    );
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        setCurrentPage(1); // reset à page 1 quand les filtres changent
+    }, [search, selectedArrondissements, selectedSubjects, dateRange]);
+
+    if (loading) return <p>Chargement...</p>;
+    if (error) return <p>Erreur de chargement des données.</p>;
 
     return (
         <div className="home-container">
@@ -37,15 +62,31 @@ const Home = () => {
                     <p className="subtitle">Recherchez un avis</p>
                     <SearchBar search={search} setSearch={setSearch} />
                     <Filters
-                        selectedArrondissement={selectedArrondissement}
-                        setSelectedArrondissement={setSelectedArrondissement}
-                        selectedSubject={selectedSubject}
-                        setSelectedSubject={setSelectedSubject}
-                        selectedDate={selectedDate}
-                        setSelectedDate={setSelectedDate}
+                        selectedArrondissements={selectedArrondissements}
+                        setSelectedArrondissements={setSelectedArrondissements}
+                        selectedSubjects={selectedSubjects}
+                        setSelectedSubjects={setSelectedSubjects}
+                        dateRange={dateRange}
+                        setDateRange={setDateRange}
                     />
-                    <p className="results-count">{`1 à ${filteredAlerts.length} sur ${alerts.length} résultats`}</p>    {/* Affiche le nombre de résultats filtrés */}
-                    <AlertList alerts={filteredAlerts} />   {/* Composant pour afficher la liste des alertes filtrées */}
+                    <p className="results-count">
+                        {`Résultats ${filteredAlerts.length} – page ${currentPage} sur ${totalPages}`}
+                    </p>
+                    <AlertList alerts={currentAlerts} />
+
+                    {totalPages > 1 && (
+                        <div className="pagination">
+                            {[...Array(totalPages)].map((_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => handlePageChange(i + 1)}
+                                    className={`page-button ${currentPage === i + 1 ? "active" : ""}`}
+                                >
+                                    {i + 1}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
                 <div className="right-column">
                     <SubscriptionBox />

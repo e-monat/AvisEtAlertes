@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../App.css";
+import InstallPrompt from "./InstallPrompt.jsx";
 
 const SubscriptionBox = () => {
     //Declaration de la variable pour afficher un toast quand quelqun clic sur "M'abonner"
@@ -27,6 +28,8 @@ const SubscriptionBox = () => {
                     L'option n'est pas encore disponible. {/*message du toast*/}
                 </div>
             )}
+
+            <InstallPrompt />
         </div>
     );
 };
