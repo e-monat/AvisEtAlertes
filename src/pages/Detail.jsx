@@ -9,7 +9,7 @@ const Detail = () => {
         const storedAlerts = localStorage.getItem("alerts");
         if (storedAlerts) {
             const parsedAlerts = JSON.parse(storedAlerts);
-            const foundAlert = parsedAlerts.find(alert => alert.id === parseInt(id));
+            const foundAlert = parsedAlerts.find(alert => alert.id === id);
             setAlert(foundAlert);
         }
     }, [id]);

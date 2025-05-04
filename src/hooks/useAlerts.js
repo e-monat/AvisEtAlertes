@@ -12,13 +12,25 @@ const useAlerts = () => {
             try {
                 const res = await fetch(API_URL);
                 const data = await res.json();
-                const records = data.result.records.map(alert => ({
-                    id: alert._id,
-                    title: alert.titre || "Sans titre",
-                    arrondissement: alert.arrondissement || "Inconnu",
-                    date: alert.date_avis,
-                    category: alert.sujet || "Autre",
-                }));
+                console.log("Data récupérée:", data.result.records);
+                const records = data.result.records.map(alert => {
+                    // Extraire l'arrondissement depuis le titre
+                    let arrondissement = "Inconnu";
+                    if (alert.titre && alert.titre.includes("– Arrondissement de")) {
+                        const parts = alert.titre.split("– Arrondissement de");
+                        if (parts.length > 1) {
+                            arrondissement = parts[1].trim();
+                        }
+                    }
+
+                    return {
+                        id: alert._id,
+                        title: alert.titre || "Sans titre",
+                        arrondissement,
+                        date: alert.date_debut,
+                        category: alert.type || "Autre",
+                    };
+                });
 
                 setAlerts(records);
                 localStorage.setItem("alerts", JSON.stringify(records));
@@ -42,3 +54,4 @@ const useAlerts = () => {
 };
 
 export default useAlerts;
+

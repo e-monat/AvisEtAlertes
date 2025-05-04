@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const Filters = ({
+                     alerts,
                      selectedArrondissements,
                      setSelectedArrondissements,
                      selectedSubjects,
@@ -9,37 +12,32 @@ const Filters = ({
                      setDateRange,
                  }) => {
     const [activeFilter, setActiveFilter] = useState(null);
-    const [options, setOptions] = useState({ arr: [], subject: [], date: [] });
+    const startDateRef = useRef();
 
-    useEffect(() => {
-        fetch("https://donnees.montreal.ca/api/3/action/datastore_search?resource_id=fc6e5f85-7eba-451c-8243-bdf35c2ab336&limit=1000")
-            .then(res => res.json())
-            .then(data => {
-                const records = data.result.records;
-                setOptions({
-                    arr: [...new Set(records.map(a => a.arrondissement))].sort(),
-                    subject: [...new Set(records.map(a => a.sujet))].sort(),
-                    date: [...new Set(records.map(a => a.date_avis))].sort(),
-                });
-            });
-    }, []);
+    const arrondissements = [...new Set(alerts.map((alert) => alert.arrondissement))].sort();
+    const subjects = [...new Set(alerts.map((alert) => alert.category))].sort();
 
-    const toggleValue = (value, list, setter) => {
-        if (list.includes(value)) {
-            setter(list.filter(v => v !== value));
-        } else {
-            setter([...list, value]);
-        }
+    const toggleSelection = (value, currentList, setter) => {
+        const updated = currentList.includes(value)
+            ? currentList.filter((v) => v !== value)
+            : [...currentList, value];
+        setter(updated);
     };
 
-    const renderOptions = (list, selected, setter) => (
+    const resetFilters = () => {
+        setSelectedArrondissements([]);
+        setSelectedSubjects([]);
+        setDateRange({ start: "", end: "" });
+    };
+
+    const renderOptions = (options, selectedList, setter) => (
         <div className="filter-dropdown">
-            {list.map((option) => (
+            {options.map((option) => (
                 <label key={option} className="filter-checkbox">
                     <input
                         type="checkbox"
-                        checked={selected.includes(option)}
-                        onChange={() => toggleValue(option, selected, setter)}
+                        checked={selectedList.includes(option)}
+                        onChange={() => toggleSelection(option, selectedList, setter)}
                     />
                     <span>{option}</span>
                 </label>
@@ -47,55 +45,67 @@ const Filters = ({
         </div>
     );
 
-    const handleDateChange = (e) => {
-        const { name, value } = e.target;
-        setDateRange(prev => ({ ...prev, [name]: value }));
-    };
-
     return (
         <div className="filters">
+            {/* Arrondissement */}
             <div
                 className={`filter-bubble ${activeFilter === "arr" ? "active" : ""}`}
                 onClick={() => setActiveFilter(activeFilter === "arr" ? null : "arr")}
             >
                 Arrondissement
-                {activeFilter === "arr" && renderOptions(options.arr, selectedArrondissements, setSelectedArrondissements)}
+                {activeFilter === "arr" &&
+                    renderOptions(arrondissements, selectedArrondissements, setSelectedArrondissements)}
             </div>
 
+            {/* Sujet */}
             <div
-                className={`filter-bubble ${activeFilter === "subject" ? "active" : ""}`}
-                onClick={() => setActiveFilter(activeFilter === "subject" ? null : "subject")}
+                className={`filter-bubble ${activeFilter === "sub" ? "active" : ""}`}
+                onClick={() => setActiveFilter(activeFilter === "sub" ? null : "sub")}
             >
                 Sujet
-                {activeFilter === "subject" && renderOptions(options.subject, selectedSubjects, setSelectedSubjects)}
+                {activeFilter === "sub" &&
+                    renderOptions(subjects, selectedSubjects, setSelectedSubjects)}
             </div>
 
+            {/* Date */}
             <div
                 className={`filter-bubble ${activeFilter === "date" ? "active" : ""}`}
-                onClick={() => setActiveFilter(activeFilter === "date" ? null : "date")}
+                onClick={() => {
+                    const alreadyOpen = activeFilter === "date";
+                    setActiveFilter(alreadyOpen ? null : "date");
+
+                    if (!alreadyOpen && startDateRef.current) {
+                        setTimeout(() => startDateRef.current.setOpen(true), 0);
+                    }
+                }}
             >
-                Période
+                Date
                 {activeFilter === "date" && (
                     <div className="filter-dropdown">
-                        <label>
-                            Début:
-                            <input type="date" name="start" value={dateRange.start} onChange={handleDateChange} />
-                        </label>
-                        <label>
-                            Fin:
-                            <input type="date" name="end" value={dateRange.end} onChange={handleDateChange} />
-                        </label>
+                        <DatePicker
+                            ref={startDateRef}
+                            selected={dateRange.start ? new Date(dateRange.start) : null}
+                            onChange={(date) =>
+                                setDateRange({
+                                    start: date ? date.toISOString().split("T")[0] : "",
+                                    end: date ? date.toISOString().split("T")[0] : "",
+                                })
+                            }
+                            dateFormat="yyyy-MM-dd"
+                            inline
+                        />
                     </div>
                 )}
             </div>
 
-            <button className="reset-btn" onClick={() => {
-                setSelectedArrondissements([]);
-                setSelectedSubjects([]);
-                setDateRange({ start: "", end: "" });
-            }}>Tout effacer</button>
+
+
+            <button className="clear-button" onClick={resetFilters}>
+                Tout effacer
+            </button>
         </div>
     );
 };
 
 export default Filters;
+

@@ -1,18 +1,21 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import { VitePWA } from 'vite-plugin-pwa';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'], // A MODIFIER
+      includeAssets: ['favicon.svg', 'pwa-192x192.png', 'pwa-512x512.png'],
       manifest: {
-        name: 'Avis et Alertes',
-        short_name: 'Avis Alertes',
-        description: 'Recevez des alertes importantes en temps réel à Montréal.',
-        theme_color: '#ffffff',
+        name: 'Avis et Alertes Montréal',
+        short_name: 'AlertesMTL',
+        description: 'Recevez les dernières alertes et avis de la Ville de Montréal.',
+        theme_color: '#007bff',
+        background_color: '#ffffff',
+        display: 'standalone',
+        start_url: '.',
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -25,26 +28,7 @@ export default defineConfig({
             type: 'image/png'
           }
         ]
-      },
-      workbox: {
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/donnees\.montreal\.ca\/api\/.*$/,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'api-cache',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 24 * 60 * 60,
-              },
-              cacheableResponse: {
-                statuses: [0, 200],
-              }
-            }
-          },
-        ],
-        navigateFallback: '/offline.html',
       }
     })
   ]
-});
+})

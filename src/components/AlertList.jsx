@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom"; //importer la navigation pour la page details
 import { FaCalendarAlt, FaMapMarkerAlt } from "react-icons/fa"; //icones de calendrier et localisation
 
+
 //composant pour afficher la liste d'alerte
 const AlertList = ({ alerts }) => {
     return (

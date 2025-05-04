@@ -24,13 +24,8 @@ const Home = () => {
         const matchesSubject = selectedSubjects.length === 0 ||
             selectedSubjects.includes(alert.category);
 
-        const matchesDate = (() => {
-            if (!dateRange.start && !dateRange.end) return true;
-            const alertDate = new Date(alert.date);
-            const start = dateRange.start ? new Date(dateRange.start) : null;
-            const end = dateRange.end ? new Date(dateRange.end) : null;
-            return (!start || alertDate >= start) && (!end || alertDate <= end);
-        })();
+        const matchesDate =
+            !dateRange.start || alert.date.startsWith(dateRange.start);
 
         return matchesSearch && matchesArrondissement && matchesSubject && matchesDate;
     });
@@ -62,6 +57,7 @@ const Home = () => {
                     <p className="subtitle">Recherchez un avis</p>
                     <SearchBar search={search} setSearch={setSearch} />
                     <Filters
+                        alerts={alerts}
                         selectedArrondissements={selectedArrondissements}
                         setSelectedArrondissements={setSelectedArrondissements}
                         selectedSubjects={selectedSubjects}
