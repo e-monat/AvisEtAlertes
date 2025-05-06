@@ -3,18 +3,19 @@ import AlertList from "../components/AlertList";
 import SearchBar from "../components/SearchBar";
 import Filters from "../components/Filters";
 import SubscriptionBox from "../components/SubscriptionBox";
-import useAlerts from "../hooks/useAlerts.js";
+import useAlerts from "../hooks/useAlerts.js"; //hook pour recuperer les alertes de l'API
 
 const ALERTS_PER_PAGE = 10;
 
 const Home = () => {
     const { alerts, loading, error } = useAlerts();
     const [search, setSearch] = useState("");
-    const [selectedArrondissements, setSelectedArrondissements] = useState([]);
-    const [selectedSubjects, setSelectedSubjects] = useState([]);
-    const [dateRange, setDateRange] = useState({ start: "", end: "" });
-    const [currentPage, setCurrentPage] = useState(1);
+    const [selectedArrondissements, setSelectedArrondissements] = useState([]); //filtres arrondissements
+    const [selectedSubjects, setSelectedSubjects] = useState([]); //filtres sujet
+    const [dateRange, setDateRange] = useState({ start: "", end: "" }); //filtre de date
+    const [currentPage, setCurrentPage] = useState(1); //pagination
 
+    //Filtrage des alertes selon la recherche et filtre
     const filteredAlerts = alerts.filter(alert => {
         const matchesSearch = alert.title.toLowerCase().includes(search.toLowerCase());
 
@@ -25,11 +26,12 @@ const Home = () => {
             selectedSubjects.includes(alert.category);
 
         const matchesDate =
-            !dateRange.start || alert.date.startsWith(dateRange.start);
+            !dateRange.start || alert.date.startsWith(dateRange.start); //filtre date exacte
 
         return matchesSearch && matchesArrondissement && matchesSubject && matchesDate;
     });
 
+    //calcul nombre de pages
     const totalPages = Math.ceil(filteredAlerts.length / ALERTS_PER_PAGE);
 
     const currentAlerts = filteredAlerts.slice(
@@ -41,6 +43,7 @@ const Home = () => {
         setCurrentPage(page);
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
+
 
     useEffect(() => {
         setCurrentPage(1); // reset à page 1 quand les filtres changent

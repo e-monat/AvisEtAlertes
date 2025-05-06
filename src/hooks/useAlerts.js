@@ -32,13 +32,13 @@ const useAlerts = () => {
                     };
                 });
 
-                setAlerts(records);
-                localStorage.setItem("alerts", JSON.stringify(records));
+                setAlerts(records); //mise a jour de l'etat
+                localStorage.setItem("alerts", JSON.stringify(records)); //mise en cache
             } catch (err) {
                 console.error("Erreur fetch:", err);
                 const fallback = localStorage.getItem("alerts");
                 if (fallback) {
-                    setAlerts(JSON.parse(fallback));
+                    setAlerts(JSON.parse(fallback)); //utilise les donnees dans le cache
                 } else {
                     setError(true);
                 }
@@ -47,10 +47,10 @@ const useAlerts = () => {
             }
         };
 
-        fetchAlerts();
+        fetchAlerts(); //appel a l'API
     }, []);
 
-    return { alerts, loading, error };
+    return { alerts, loading, error }; //retour du hook
 };
 
 export default useAlerts;

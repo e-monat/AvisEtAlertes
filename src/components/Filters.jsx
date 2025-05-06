@@ -12,9 +12,9 @@ const Filters = ({
                      setDateRange,
                  }) => {
     const [activeFilter, setActiveFilter] = useState(null);
-    const startDateRef = useRef();
+    const startDateRef = useRef(); //ref vers datepicker
 
-    const arrondissements = [...new Set(alerts.map((alert) => alert.arrondissement))].sort();
+    const arrondissements = [...new Set(alerts.map((alert) => alert.arrondissement))].sort(); //extrait le arrondissement de la liste
     const subjects = [...new Set(alerts.map((alert) => alert.category))].sort();
 
     const toggleSelection = (value, currentList, setter) => {
@@ -88,7 +88,7 @@ const Filters = ({
                             onChange={(date) =>
                                 setDateRange({
                                     start: date ? date.toISOString().split("T")[0] : "",
-                                    end: date ? date.toISOString().split("T")[0] : "",
+                                    end: date ? date.toISOString().split("T")[0] : "", // filtre uniquement une date
                                 })
                             }
                             dateFormat="yyyy-MM-dd"

@@ -6,9 +6,9 @@ const InstallPrompt = () => {
 
     useEffect(() => {
         const handler = (e) => {
-            e.preventDefault();
+            e.preventDefault(); //empeche le toast default
             setDeferredPrompt(e);
-            setShowPrompt(true);
+            setShowPrompt(true); //montre mon toast perso
         };
 
         window.addEventListener("beforeinstallprompt", handler);
@@ -18,10 +18,10 @@ const InstallPrompt = () => {
 
     const handleInstallClick = () => {
         if (deferredPrompt) {
-            deferredPrompt.prompt();
+            deferredPrompt.prompt(); // declenche l'installation
             deferredPrompt.userChoice.then(() => {
                 setDeferredPrompt(null);
-                setShowPrompt(false);
+                setShowPrompt(false); //cache le toast
             });
         }
     };
