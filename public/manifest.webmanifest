@@ -3,7 +3,7 @@
   "short_name": "AlertesMTL",
   "description": "Recevez les dernières alertes et avis de la Ville de Montréal.",
   "start_url": ".",
-  "display": "standalone",
+  "display": "standalone", //mode daffichage comme une app sans barre de recherche
   "background_color": "#ffffff",
   "theme_color": "#007bff",
   "icons": [
