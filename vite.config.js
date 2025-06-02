@@ -37,7 +37,7 @@ export default defineConfig({
         ]
       },
       workbox: {
-        navigateFallback: '/offline.html',
+        // navigateFallback: '/offline.html',
         runtimeCaching: [
           {
             urlPattern: ({ request }) =>

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-const API_URL = "https://donnees.montreal.ca/api/3/action/datastore_search?resource_id=fc6e5f85-7eba-451c-8243-bdf35c2ab336&limit=1000";
+const API_URL = "http://localhost:3000/api/avis-alertes"; // 👈 ton backend maintenant
 
 const Detail = () => {
-    const { id } = useParams(); // recupere le ID
+    const { id } = useParams();
     const [alert, setAlert] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -15,27 +15,13 @@ const Detail = () => {
                 const res = await fetch(API_URL);
                 const data = await res.json();
 
-                const record = data.result.records.find(a => String(a._id) === id); //cherche l'alerte qui correspond a l'ID
+                const record = data.find(a => a.id == id); // double égal pour "1" == 1
+
                 if (record) {
-                    // extraire l'arrondissement à partir du titre
-                    let arrondissement = "Inconnu";
-                    const match = alert.titre?.match(
-                        /(arr(?:\.|ondissement)?\s+d['e]?\s*([A-Za-zÀ-ÿ0-9\s\-–]+))|,\s*([A-Za-zÀ-ÿ\-–]+(?:–[A-Za-zÀ-ÿ\-–]+)*)$/i
-                    );
-
-                    if (match) {
-                        arrondissement = match[2] || match[3] || "Inconnu";
-                    }
-
-                    setAlert({
-                        id: record._id,
-                        title: record.titre || "Sans titre",
-                        arrondissement,
-                        date: record.date_debut?.split("T")[0] || "Date Inconnue",
-                        category: record.type || "Autre",
-                    });
+                    setAlert(record);
                 } else {
                     setAlert(null);
+                    setError(true);
                 }
             } catch (err) {
                 console.error("Erreur fetch:", err);
@@ -49,8 +35,7 @@ const Detail = () => {
     }, [id]);
 
     if (loading) return <p>Chargement...</p>;
-    if (error) return <p>Erreur de chargement.</p>;
-    if (!alert) return <h2>Alerte non trouvée</h2>;
+    if (error || !alert) return <p>Erreur de chargement.</p>;
 
     return (
         <div className="detail">
@@ -63,4 +48,5 @@ const Detail = () => {
 };
 
 export default Detail;
+
 

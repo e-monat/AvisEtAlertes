@@ -1,33 +1,25 @@
 import React, { useState } from "react";
 import "../App.css";
 import InstallPrompt from "./InstallPrompt.jsx";
+import PushSubscriptionModal from "./PushSubscriptionModal.jsx";
 
 const SubscriptionBox = () => {
-    //Declaration de la variable pour afficher un toast quand quelqun clic sur "M'abonner"
-    const [showToast, setShowToast] = useState(false);
+    const [showModal, setShowModal] = useState(false); // pour afficher la modale
 
     const handleSubscribeClick = (e) => {
-        e.preventDefault();//empeche la redirection
-        setShowToast(true);//affiche le toast
-        setTimeout(() => {
-            setShowToast(false);//affiche le toast pour 3 secondes
-        }, 3000);
+        e.preventDefault();
+        setShowModal(true); // ouvre la modale
     };
 
     return (
         <div className="subscription-box">
             <h2>S'abonner aux alertes</h2>
-            <p>Pour recevoir des avis et alertes par courriel ou texto, vous devez avoir créé un compte.</p>
+            <p>Vous recevrez une notification push lorsqu'une nouvelle alerte sera publiée.</p>
             <a href="#" className="subscribe-link" onClick={handleSubscribeClick}>
                 M'abonner →
             </a>
 
-
-            {showToast && (
-                <div className="toast">
-                    L'option n'est pas encore disponible. {/*message du toast*/}
-                </div>
-            )}
+            {showModal && <PushSubscriptionModal onClose={() => setShowModal(false)} />}
 
             <InstallPrompt />
         </div>
@@ -35,3 +27,4 @@ const SubscriptionBox = () => {
 };
 
 export default SubscriptionBox;
+

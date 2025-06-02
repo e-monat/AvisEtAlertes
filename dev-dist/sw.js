@@ -78,11 +78,11 @@ define(['./workbox-34b6f136'], (function (workbox) { 'use strict';
    * See https://goo.gl/S9QRab
    */
   workbox.precacheAndRoute([{
-    "url": "/offline.html",
-    "revision": "0.ee4sk8gk42g"
+    "url": "index.html",
+    "revision": "0.bo1nl3sp78"
   }], {});
   workbox.cleanupOutdatedCaches();
-  workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("/offline.html"), {
+  workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {
     allowlist: [/^\/$/]
   }));
   workbox.registerRoute(({
