@@ -16,18 +16,19 @@ const useAlerts = () => {
                 const records = data.result.records.map(alert => {
                     // Extraire l'arrondissement depuis le titre
                     let arrondissement = "Inconnu";
-                    if (alert.titre && alert.titre.includes("– Arrondissement de")) {
-                        const parts = alert.titre.split("– Arrondissement de");
-                        if (parts.length > 1) {
-                            arrondissement = parts[1].trim();
-                        }
+                    const match = alert.titre?.match(
+                        /(arr(?:\.|ondissement)?\s+d['e]?\s*([A-Za-zÀ-ÿ0-9\s\-–]+))|,\s*([A-Za-zÀ-ÿ\-–]+(?:–[A-Za-zÀ-ÿ\-–]+)*)$/i
+                    );
+
+                    if (match) {
+                        arrondissement = match[2] || match[3] || "Inconnu";
                     }
 
                     return {
                         id: alert._id,
                         title: alert.titre || "Sans titre",
                         arrondissement,
-                        date: alert.date_debut,
+                        date: alert.date_debut?.split("T")[0] || "Date Inconnue",
                         category: alert.type || "Autre",
                     };
                 });

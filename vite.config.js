@@ -1,13 +1,20 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { VitePWA } from 'vite-plugin-pwa'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'pwa-192x192.png', 'pwa-512x512.png'],
+      includeAssets: [
+        'favicon.svg',
+        'pwa-192x192.png',
+        'pwa-512x512.png',
+        'apple-touch-icon.png',
+        'favicon.ico',
+        'offline.html'
+      ],
       manifest: {
         name: 'Avis et Alertes Montréal',
         short_name: 'AlertesMTL',
@@ -15,7 +22,7 @@ export default defineConfig({
         theme_color: '#007bff',
         background_color: '#ffffff',
         display: 'standalone',
-        start_url: '.',
+        start_url: '/',
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -30,6 +37,7 @@ export default defineConfig({
         ]
       },
       workbox: {
+        navigateFallback: '/offline.html',
         runtimeCaching: [
           {
             urlPattern: ({ request }) =>
@@ -57,7 +65,10 @@ export default defineConfig({
             }
           }
         ]
+      },
+      devOptions: {
+        enabled: true
       }
     })
   ]
-})
+});

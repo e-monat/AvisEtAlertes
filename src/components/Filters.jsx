@@ -12,12 +12,13 @@ const Filters = ({
                      setDateRange,
                  }) => {
     const [activeFilter, setActiveFilter] = useState(null);
-    const startDateRef = useRef(); //ref vers datepicker
+    const startDateRef = useRef();
 
-    const arrondissements = [...new Set(alerts.map((alert) => alert.arrondissement))].sort(); //extrait le arrondissement de la liste
+    const arrondissements = [...new Set(alerts.map((alert) => alert.arrondissement))].sort();
     const subjects = [...new Set(alerts.map((alert) => alert.category))].sort();
 
-    const toggleSelection = (value, currentList, setter) => {
+    const toggleSelection = (e, value, currentList, setter) => {
+        e.stopPropagation();
         const updated = currentList.includes(value)
             ? currentList.filter((v) => v !== value)
             : [...currentList, value];
@@ -31,13 +32,13 @@ const Filters = ({
     };
 
     const renderOptions = (options, selectedList, setter) => (
-        <div className="filter-dropdown">
+        <div className="filter-dropdown" onClick={(e) => e.stopPropagation()}>
             {options.map((option) => (
                 <label key={option} className="filter-checkbox">
                     <input
                         type="checkbox"
                         checked={selectedList.includes(option)}
-                        onChange={() => toggleSelection(option, selectedList, setter)}
+                        onChange={(e) => toggleSelection(e, option, selectedList, setter)}
                     />
                     <span>{option}</span>
                 </label>
@@ -47,7 +48,7 @@ const Filters = ({
 
     return (
         <div className="filters">
-            {/* Arrondissement */}
+            {/* Filtres principaux */}
             <div
                 className={`filter-bubble ${activeFilter === "arr" ? "active" : ""}`}
                 onClick={() => setActiveFilter(activeFilter === "arr" ? null : "arr")}
@@ -57,7 +58,6 @@ const Filters = ({
                     renderOptions(arrondissements, selectedArrondissements, setSelectedArrondissements)}
             </div>
 
-            {/* Sujet */}
             <div
                 className={`filter-bubble ${activeFilter === "sub" ? "active" : ""}`}
                 onClick={() => setActiveFilter(activeFilter === "sub" ? null : "sub")}
@@ -67,7 +67,6 @@ const Filters = ({
                     renderOptions(subjects, selectedSubjects, setSelectedSubjects)}
             </div>
 
-            {/* Date */}
             <div
                 className={`filter-bubble ${activeFilter === "date" ? "active" : ""}`}
                 onClick={() => {
@@ -81,14 +80,14 @@ const Filters = ({
             >
                 Date
                 {activeFilter === "date" && (
-                    <div className="filter-dropdown">
+                    <div className="filter-dropdown" onClick={(e) => e.stopPropagation()}>
                         <DatePicker
                             ref={startDateRef}
                             selected={dateRange.start ? new Date(dateRange.start) : null}
                             onChange={(date) =>
                                 setDateRange({
                                     start: date ? date.toISOString().split("T")[0] : "",
-                                    end: date ? date.toISOString().split("T")[0] : "", // filtre uniquement une date
+                                    end: date ? date.toISOString().split("T")[0] : "",
                                 })
                             }
                             dateFormat="yyyy-MM-dd"
@@ -98,14 +97,51 @@ const Filters = ({
                 )}
             </div>
 
+            {/* Filtres actifs */}
+            {(selectedArrondissements.length > 0 ||
+                selectedSubjects.length > 0 ||
+                dateRange.start) && (
+                <div className="active-filters">
+                    {selectedArrondissements.map((arr) => (
+                        <span key={arr} className="filter-tag">
+                            {arr}
+                            <button onClick={() =>
+                                setSelectedArrondissements(selectedArrondissements.filter((a) => a !== arr))
+                            }>
+                                ×
+                            </button>
+                        </span>
+                    ))}
 
+                    {selectedSubjects.map((subj) => (
+                        <span key={subj} className="filter-tag">
+                            {subj}
+                            <button onClick={() =>
+                                setSelectedSubjects(selectedSubjects.filter((s) => s !== subj))
+                            }>
+                                ×
+                            </button>
+                        </span>
+                    ))}
 
-            <button className="clear-button" onClick={resetFilters}>
-                Tout effacer
-            </button>
+                    {dateRange.start && (
+                        <span className="filter-tag">
+                            {dateRange.start}
+                            <button onClick={() => setDateRange({ start: "", end: "" })}>
+                                ×
+                            </button>
+                        </span>
+                    )}
+
+                    <button className="clear-button" onClick={resetFilters}>
+                        Tout effacer
+                    </button>
+                </div>
+            )}
         </div>
     );
 };
 
 export default Filters;
+
 
