@@ -52,22 +52,69 @@ router.post("/send-notification", async (req, res) => {
     }
 });
 
+
 // GET /avis-alertes
 router.get("/avis-alertes", async (req, res) => {
     try {
         const response = await fetch("https://donnees.montreal.ca/api/3/action/datastore_search?resource_id=fc6e5f85-7eba-451c-8243-bdf35c2ab336&limit=1000");
         const data = await response.json();
-        const records = data.result.records.map(alert => ({
-            id: alert._id,
-            title: alert.titre || "Sans titre",
-            arrondissement: alert.titre?.split("– Arrondissement de")[1]?.trim() || "Inconnu",
-            date: alert.date_debut,
-            category: alert.type || "Autre",
-        }));
+
+        const ARRONDISSEMENTS_VALIDES = [
+            "Ahuntsic-Cartierville", "Anjou", "Côte-des-Neiges–Notre-Dame-de-Grâce",
+            "Lachine", "LaSalle", "L'Île-Bizard–Sainte-Geneviève", "Mercier–Hochelaga-Maisonneuve",
+            "Montréal-Nord", "Outremont", "Pierrefonds-Roxboro", "Plateau-Mont-Royal",
+            "Rivière-des-Prairies–Pointe-aux-Trembles", "Rosemont–La Petite-Patrie",
+            "Saint-Laurent", "Saint-Léonard", "Sud-Ouest", "Verdun", "Ville-Marie",
+            "Villeray–Saint-Michel–Parc-Extension"
+        ];
+
+        const normalizeText = (text) => {
+            return text
+                .replace(/–/g, "-")
+                .replace(/\s+/g, " ")
+                .trim()
+                .toLowerCase();
+        };
+
+        const records = data.result.records.map(alert => {
+            const titre = alert.titre || "";
+            const titreNettoye = normalizeText(titre);
+
+            let arrondissement = "Inconnu";
+
+            // Recherche si l’un des arrondissements valides est mentionné dans le titre
+            for (const a of ARRONDISSEMENTS_VALIDES) {
+                const aNettoye = normalizeText(a);
+                if (titreNettoye.includes(aNettoye)) {
+                    arrondissement = a;
+                    break;
+                }
+            }
+
+            const dateBrute = alert.date_debut;
+            const date = typeof dateBrute === "string" && dateBrute.includes("T")
+                ? dateBrute.split("T")[0]
+                : "Date inconnue";
+
+            return {
+                id: alert._id,
+                title: titre || "Sans titre",
+                arrondissement,
+                date,
+                category: alert.type || "Autre"
+            };
+        });
+
         res.json(records);
     } catch (err) {
+        console.error("Erreur GET /avis-alertes:", err);
         res.status(500).json({ error: "Erreur récupération des alertes" });
     }
 });
+
+
+
+
+
 
 module.exports = router;

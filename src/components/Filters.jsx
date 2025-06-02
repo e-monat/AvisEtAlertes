@@ -14,7 +14,22 @@ const Filters = ({
     const [activeFilter, setActiveFilter] = useState(null);
     const startDateRef = useRef();
 
-    const arrondissements = [...new Set(alerts.map((alert) => alert.arrondissement))].sort();
+    const OFFICIELS = [
+        "Ahuntsic-Cartierville", "Anjou", "Côte-des-Neiges–Notre-Dame-de-Grâce",
+        "Lachine", "LaSalle", "L'Île-Bizard–Sainte-Geneviève", "Mercier–Hochelaga-Maisonneuve",
+        "Montréal-Nord", "Outremont", "Pierrefonds-Roxboro", "Plateau-Mont-Royal",
+        "Rivière-des-Prairies–Pointe-aux-Trembles", "Rosemont–La Petite-Patrie",
+        "Saint-Laurent", "Saint-Léonard", "Sud-Ouest", "Verdun", "Ville-Marie",
+        "Villeray–Saint-Michel–Parc-Extension"
+    ];
+
+    const arrondissements = [...new Set([
+        ...alerts.map((alert) => alert.arrondissement),
+        ...OFFICIELS
+    ])]
+        .filter(a => a && a !== "Inconnu")
+        .sort();
+
     const subjects = [...new Set(alerts.map((alert) => alert.category))].sort();
 
     const toggleSelection = (e, value, currentList, setter) => {

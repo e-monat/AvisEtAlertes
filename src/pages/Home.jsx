@@ -30,6 +30,9 @@ const Home = () => {
 
         return matchesSearch && matchesArrondissement && matchesSubject && matchesDate;
     });
+    console.log("💡 Alertes totales:", alerts.length);
+    console.log("🔍 Alertes après filtrage:", filteredAlerts.length);
+
 
     //calcul nombre de pages
     const totalPages = Math.ceil(filteredAlerts.length / ALERTS_PER_PAGE);

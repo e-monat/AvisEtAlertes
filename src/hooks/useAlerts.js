@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const API_URL = "https://donnees.montreal.ca/api/3/action/datastore_search?resource_id=fc6e5f85-7eba-451c-8243-bdf35c2ab336&limit=1000";
+const API_URL = "http://localhost:3000/api/avis-alertes";
 
 const useAlerts = () => {
     const [alerts, setAlerts] = useState([]);
@@ -12,35 +12,21 @@ const useAlerts = () => {
             try {
                 const res = await fetch(API_URL);
                 const data = await res.json();
-                console.log("Data récupérée:", data.result.records);
-                const records = data.result.records.map(alert => {
-                    // Extraire l'arrondissement depuis le titre
-                    let arrondissement = "Inconnu";
-                    const match = alert.titre?.match(
-                        /(arr(?:\.|ondissement)?\s+d['e]?\s*([A-Za-zÀ-ÿ0-9\s\-–]+))|,\s*([A-Za-zÀ-ÿ\-–]+(?:–[A-Za-zÀ-ÿ\-–]+)*)$/i
-                    );
 
-                    if (match) {
-                        arrondissement = match[2] || match[3] || "Inconnu";
-                    }
-
-                    return {
-                        id: alert._id,
-                        title: alert.titre || "Sans titre",
-                        arrondissement,
-                        date: alert.date_debut?.split("T")[0] || "Date Inconnue",
-                        category: alert.type || "Autre",
-                    };
-                });
-
-                setAlerts(records); //mise à jour de l'état
-                localStorage.setItem("alerts", JSON.stringify(records)); //mise en cache
+                console.log("Données reçues du backend :", data);
+                if (Array.isArray(data)) {
+                    setAlerts(data);
+                    localStorage.setItem("alerts", JSON.stringify(data));
+                } else {
+                    console.error("Données non valides (pas un tableau)");
+                    setError(true);
+                }
             } catch (err) {
                 console.error("Erreur fetch:", err);
                 const fallback = localStorage.getItem("alerts");
                 if (fallback) {
                     console.warn("Données chargées depuis le cache local.");
-                    setAlerts(JSON.parse(fallback)); //utilise les données dans le cache
+                    setAlerts(JSON.parse(fallback));
                 } else {
                     setError(true);
                 }
@@ -49,12 +35,13 @@ const useAlerts = () => {
             }
         };
 
-        fetchAlerts(); //appel à l'API
+        fetchAlerts();
     }, []);
 
-    return { alerts, loading, error }; //retour du hook
+    return { alerts, loading, error };
 };
 
 export default useAlerts;
+
 
 
