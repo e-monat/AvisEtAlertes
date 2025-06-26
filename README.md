@@ -23,7 +23,7 @@ Elle se base sur l’API officielle de la Ville de Montréal, mais passe par un 
 ---
 
 ##  3: Organisation du projet
-
+```
 -labo1/
 ├── backend/ # Backend Express
 │ ├── models/ 
@@ -57,7 +57,8 @@ Elle se base sur l’API officielle de la Ville de Montréal, mais passe par un 
 │ ├── index.css
 │ └── main.jsx # Point d’entrée React
 -ReadMe
-## (Je ne sais pas pourquoi ça s'affiche mal)
+```
+
     
 ## 4: Instructions pour installer et exécuter le code
 
